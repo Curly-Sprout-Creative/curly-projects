@@ -1,0 +1,24 @@
+.curly-project-link-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 8px;
+}
+
+.curly-project-input-label {
+	width: 180px;
+}
+
+.curly-project-input-url {
+	flex: 1 1 320px;
+	min-width: 240px;
+}
+
+.curly-project-target {
+	white-space: nowrap;
+}
+
+.curly-project-remove-link {
+	color: #b32d2e;
+}

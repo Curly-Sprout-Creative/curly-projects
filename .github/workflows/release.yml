@@ -1,0 +1,29 @@
+name: Build and Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build plugin zip
+        run: |
+          mkdir -p dist/curly-projects
+          cp -r curly-projects.php uninstall.php assets includes vendor dist/curly-projects/
+          rm -rf dist/curly-projects/vendor/plugin-update-checker/.git
+          cd dist && zip -r curly-projects.zip curly-projects
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/curly-projects.zip
+          generate_release_notes: true
