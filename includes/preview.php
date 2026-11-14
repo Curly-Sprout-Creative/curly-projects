@@ -282,9 +282,101 @@ function curly_projects_featured_column_value( $column, $post_id ) {
 	if ( 'project_featured' !== $column ) {
 		return;
 	}
-	echo get_post_meta( $post_id, CURLY_PROJECTS_PREVIEW_META['featured'], true )
-		? '<span aria-label="Featured" title="Featured on the home page">★</span>'
-		: '<span style="color:#a7aaad" title="Not on the home page">—</span>';
+
+	$featured = (bool) get_post_meta( $post_id, CURLY_PROJECTS_PREVIEW_META['featured'], true );
+
+	// The hidden state rides along for the inline-edit script to read.
+	printf(
+		'<span class="curly-featured-flag" data-featured="%1$s">%2$s</span>',
+		$featured ? '1' : '0',
+		$featured
+			? '<span aria-label="Featured" title="Featured on the home page">★</span>'
+			: '<span style="color:#a7aaad" title="Not on the home page">—</span>'
+	);
+}
+
+add_action( 'quick_edit_custom_box', 'curly_projects_quick_edit_box', 10, 2 );
+
+/**
+ * Add the featured checkbox to Quick Edit.
+ *
+ * @param string $column_name Column key.
+ * @param string $post_type   Post type.
+ */
+function curly_projects_quick_edit_box( $column_name, $post_type ) {
+	if ( 'projects' !== $post_type || 'project_featured' !== $column_name ) {
+		return;
+	}
+
+	wp_nonce_field( 'curly_projects_quick_edit', 'curly_projects_quick_nonce' );
+	?>
+	<fieldset class="inline-edit-col-right">
+		<div class="inline-edit-col">
+			<label class="alignleft">
+				<input type="checkbox" name="<?php echo esc_attr( CURLY_PROJECTS_PREVIEW_META['featured'] ); ?>" value="1" />
+				<span class="checkbox-title">Feature on the home page</span>
+			</label>
+		</div>
+	</fieldset>
+	<?php
+}
+
+add_action( 'save_post_projects', 'curly_projects_save_quick_edit_featured' );
+
+/**
+ * Persist the Quick Edit checkbox.
+ *
+ * Separate from the meta box handler: Quick Edit posts its own nonce and never
+ * the meta box's, and the meta box is already written when this runs.
+ *
+ * @param int $post_id Post id.
+ */
+function curly_projects_save_quick_edit_featured( $post_id ) {
+	if ( ! isset( $_POST['curly_projects_quick_nonce'] ) ) {
+		return;
+	}
+
+	$nonce = sanitize_text_field( wp_unslash( $_POST['curly_projects_quick_nonce'] ) );
+	if ( ! wp_verify_nonce( $nonce, 'curly_projects_quick_edit' ) ) {
+		return;
+	}
+
+	if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$meta = CURLY_PROJECTS_PREVIEW_META['featured'];
+	if ( ! empty( $_POST[ $meta ] ) ) {
+		update_post_meta( $post_id, $meta, 1 );
+	} else {
+		delete_post_meta( $post_id, $meta );
+	}
+}
+
+add_action( 'admin_enqueue_scripts', 'curly_projects_admin_list_assets' );
+
+/**
+ * Inline-edit script on the projects list.
+ *
+ * @param string $hook_suffix Current admin page.
+ */
+function curly_projects_admin_list_assets( $hook_suffix ) {
+	if ( 'edit.php' !== $hook_suffix ) {
+		return;
+	}
+
+	$screen = get_current_screen();
+	if ( ! $screen || 'projects' !== $screen->post_type ) {
+		return;
+	}
+
+	wp_enqueue_script(
+		'curly-projects-quick-edit',
+		CURLY_PROJECTS_URL . 'assets/js/quick-edit.js',
+		array( 'jquery', 'inline-edit-post' ),
+		CURLY_PROJECTS_VERSION,
+		true
+	);
 }
 
 add_action( 'admin_enqueue_scripts', 'curly_projects_preview_admin_assets' );

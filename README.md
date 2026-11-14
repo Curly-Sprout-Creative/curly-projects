@@ -53,7 +53,9 @@ Attributes: `id` (defaults to the current post), `ratio` (overrides the default
 ### Featured projects
 
 The **Feature on the home page** checkbox in the Scroll Preview box sets
-`_project_featured`. Point the home page Post Loop's meta query at
+`_project_featured`; the same checkbox is available in **Quick Edit** (click
+Quick Edit on the projects list), so a project can be moved on or off the home
+page without opening it. Point the home page Post Loop's meta query at
 `_project_featured = 1`; leave the archive loop unfiltered so it lists them all.
 The projects list has a **Home** column showing which ones are starred.
 
