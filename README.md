@@ -25,6 +25,10 @@ GitHub Release → plugin-update-checker → wp-admin, the same pipeline as
 |---|---|---|
 | `_project_links` | array of `{label, url, target}` | The links shown under the card. Repeater UI in the post edit screen. |
 | `_project_url` | string | Optional primary URL, used as a fallback when `_project_links` is empty. |
+| `_project_preview_desktop` | attachment id | Full-height desktop screenshot (1440px wide) shown in the browser frame. |
+| `_project_preview_mobile` | attachment id | Full-height mobile screenshot (390px wide) shown in the phone frame. |
+| `_project_preview_bg` | hex colour | Card background — usually the site's dominant brand colour. |
+| `_project_preview_frame` | hex colour | Border colour of both device frames. |
 
 Both are registered with `show_in_rest`, so they work with Oxygen 6 dynamic
 data and the MCP agent.
@@ -33,6 +37,17 @@ data and the MCP agent.
 
 Both default to the current loop post, so drop them into an Oxygen 6 Post Loop
 item with no `id`.
+
+### `[project_preview]`
+
+Renders the two-screen scrolling mockup: full-page screenshots inside a desktop
+and a phone frame, panning as the card crosses the viewport, on a brand-coloured
+card. Reads the four `_project_preview_*` fields above (all editable in the
+project edit screen, no ACF needed). Falls back to the featured image when no
+desktop screenshot is set.
+
+Attributes: `id` (defaults to the current post), `ratio` (overrides the default
+`3 / 2` card ratio, e.g. `ratio="4 / 3"`).
 
 ### `[project_links]`
 

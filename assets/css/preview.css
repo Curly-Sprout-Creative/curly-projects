@@ -1,0 +1,75 @@
+/**
+ * Scroll preview — two-screen mockup card.
+ *
+ * Geometry is percentage-based so a card scales with its column. The frame
+ * colours come from the project's meta via inline custom properties.
+ */
+
+.csc-preview {
+	position: relative;
+	aspect-ratio: var(--csc-preview-ratio, 3 / 2);
+	background: var(--csc-preview-bg, var(--color-mid, #2a715e));
+	border-radius: 16px;
+	overflow: hidden;
+	clip-path: inset(0 round 16px);
+}
+
+.csc-preview__shot {
+	position: absolute;
+	background: #fff;
+	border: 3px solid var(--csc-preview-frame, var(--color-light, #fff));
+	border-radius: 11px;
+	box-shadow: 0 16px 16px rgba(0, 0, 0, 0.4);
+	overflow: hidden;
+	clip-path: inset(0 round 11px);
+}
+
+.csc-preview__shot--desktop {
+	top: 6%;
+	left: 4%;
+	width: 80%;
+	aspect-ratio: 1440 / 1000;
+}
+
+.csc-preview__shot--phone {
+	right: 2.5%;
+	bottom: 4%;
+	width: 21%;
+	aspect-ratio: 390 / 844;
+	border-radius: 19px;
+	clip-path: inset(0 round 19px);
+}
+
+.csc-preview__pan {
+	position: absolute;
+	inset: 0;
+	will-change: transform;
+	transform: translate3d(0, 0, 0);
+}
+
+.csc-preview__pan img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* No screenshots set: the featured image stands in. */
+.csc-preview--fallback img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+@media (max-width: 767px) {
+	.csc-preview {
+		border-radius: 12px;
+		clip-path: inset(0 round 12px);
+	}
+
+	.csc-preview__shot,
+	.csc-preview__shot--phone {
+		border-width: 2px;
+		border-radius: 12px;
+		clip-path: inset(0 round 12px);
+	}
+}
