@@ -3,7 +3,7 @@
  * Plugin Name:       Curly Projects
  * Plugin URI:        https://github.com/Curly-Sprout-Creative/curly-projects
  * Description:       Custom "projects" post type with project service + project type taxonomies, a links repeater meta box, a per-project scroll preview (screenshots + colours) rendered by [project_preview], and [project_links] / [project_services] shortcodes for Oxygen 6 Post Loops. Pairs with the /projects/ archive.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            Curly Sprout Creative
  * License:           GPL-2.0-or-later
  * Text Domain:       curly-projects
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CURLY_PROJECTS_VERSION', '1.1.0' );
+define( 'CURLY_PROJECTS_VERSION', '1.1.1' );
 define( 'CURLY_PROJECTS_FILE', __FILE__ );
 define( 'CURLY_PROJECTS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CURLY_PROJECTS_URL', plugin_dir_url( __FILE__ ) );

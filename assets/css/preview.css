@@ -12,6 +12,9 @@
 	border-radius: 16px;
 	overflow: hidden;
 	clip-path: inset(0 round 16px);
+	/* The card's service label sits on a -14px margin written for the old
+	   image element; this keeps it clear of the preview. */
+	margin-bottom: 14px;
 }
 
 .csc-preview__shot {
