@@ -29,6 +29,7 @@ GitHub Release → plugin-update-checker → wp-admin, the same pipeline as
 | `_project_preview_mobile` | attachment id | Full-height mobile screenshot (390px wide) shown in the phone frame. |
 | `_project_preview_bg` | hex colour | Card background — usually the site's dominant brand colour. |
 | `_project_preview_frame` | hex colour | Border colour of both device frames. |
+| `_project_featured` | bool | Show the project on the home page. The Projects archive always lists every published project. |
 
 Both are registered with `show_in_rest`, so they work with Oxygen 6 dynamic
 data and the MCP agent.
@@ -48,6 +49,13 @@ desktop screenshot is set.
 
 Attributes: `id` (defaults to the current post), `ratio` (overrides the default
 `3 / 2` card ratio, e.g. `ratio="4 / 3"`).
+
+### Featured projects
+
+The **Feature on the home page** checkbox in the Scroll Preview box sets
+`_project_featured`. Point the home page Post Loop's meta query at
+`_project_featured = 1`; leave the archive loop unfiltered so it lists them all.
+The projects list has a **Home** column showing which ones are starred.
 
 ### `[project_links]`
 

@@ -15,10 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 const CURLY_PROJECTS_PREVIEW_META = array(
-	'desktop' => '_project_preview_desktop',
-	'mobile'  => '_project_preview_mobile',
-	'bg'      => '_project_preview_bg',
-	'frame'   => '_project_preview_frame',
+	'desktop'  => '_project_preview_desktop',
+	'mobile'   => '_project_preview_mobile',
+	'bg'       => '_project_preview_bg',
+	'frame'    => '_project_preview_frame',
+	'featured' => '_project_featured',
 );
 
 add_action( 'init', 'curly_projects_register_preview_meta', 21 );
@@ -54,6 +55,17 @@ function curly_projects_register_preview_meta() {
 			)
 		);
 	}
+
+	register_post_meta(
+		'projects',
+		CURLY_PROJECTS_PREVIEW_META['featured'],
+		array(
+			'type'          => 'boolean',
+			'single'        => true,
+			'show_in_rest'  => true,
+			'auth_callback' => 'curly_projects_meta_auth',
+		)
+	);
 }
 
 add_action( 'add_meta_boxes', 'curly_projects_add_preview_meta_box' );
@@ -82,6 +94,7 @@ function curly_projects_render_preview_meta_box( $post ) {
 	$mobile  = (int) get_post_meta( $post->ID, CURLY_PROJECTS_PREVIEW_META['mobile'], true );
 	$bg      = (string) get_post_meta( $post->ID, CURLY_PROJECTS_PREVIEW_META['bg'], true );
 	$frame   = (string) get_post_meta( $post->ID, CURLY_PROJECTS_PREVIEW_META['frame'], true );
+	$featured = (bool) get_post_meta( $post->ID, CURLY_PROJECTS_PREVIEW_META['featured'], true );
 
 	$fields = array(
 		array(
@@ -168,6 +181,18 @@ function curly_projects_render_preview_meta_box( $post ) {
 		<?php endforeach; ?>
 	</div>
 
+	<p class="curly-preview-featured">
+		<label>
+			<input type="checkbox" name="<?php echo esc_attr( CURLY_PROJECTS_PREVIEW_META['featured'] ); ?>"
+				value="1" <?php checked( $featured ); ?> />
+			<strong>Feature on the home page</strong>
+		</label>
+		<span class="description">
+			The home page shows featured projects only; the Projects page lists every published
+			project regardless of this setting.
+		</span>
+	</p>
+
 	<p class="description">
 		The preview renders wherever <code>[project_preview]</code> is placed — the project card
 		component on the home page and the projects archive both use it.
@@ -216,6 +241,50 @@ function curly_projects_save_preview_meta( $post_id ) {
 			delete_post_meta( $post_id, $meta );
 		}
 	}
+
+	// The checkbox is absent from $_POST when unchecked, so it is always written.
+	$featured = CURLY_PROJECTS_PREVIEW_META['featured'];
+	if ( ! empty( $_POST[ $featured ] ) ) {
+		update_post_meta( $post_id, $featured, 1 );
+	} else {
+		delete_post_meta( $post_id, $featured );
+	}
+}
+
+add_filter( 'manage_projects_posts_columns', 'curly_projects_featured_column' );
+
+/**
+ * Add a "Home page" column to the projects list.
+ *
+ * @param array $columns Existing columns.
+ * @return array
+ */
+function curly_projects_featured_column( $columns ) {
+	$out = array();
+	foreach ( $columns as $key => $label ) {
+		$out[ $key ] = $label;
+		if ( 'title' === $key ) {
+			$out['project_featured'] = 'Home';
+		}
+	}
+	return $out;
+}
+
+add_action( 'manage_projects_posts_custom_column', 'curly_projects_featured_column_value', 10, 2 );
+
+/**
+ * Render the featured marker.
+ *
+ * @param string $column  Column key.
+ * @param int    $post_id Post id.
+ */
+function curly_projects_featured_column_value( $column, $post_id ) {
+	if ( 'project_featured' !== $column ) {
+		return;
+	}
+	echo get_post_meta( $post_id, CURLY_PROJECTS_PREVIEW_META['featured'], true )
+		? '<span aria-label="Featured" title="Featured on the home page">★</span>'
+		: '<span style="color:#a7aaad" title="Not on the home page">—</span>';
 }
 
 add_action( 'admin_enqueue_scripts', 'curly_projects_preview_admin_assets' );
