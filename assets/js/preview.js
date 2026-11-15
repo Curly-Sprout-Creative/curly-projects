@@ -19,7 +19,7 @@
 ( function () {
 	var CFG = {
 		easing: 0.14, // 0..1 — how hard the screens chase the scroll
-		startVisible: 0.5, // how much of the frame must be on screen first
+		startAt: 0.5, // pan starts when the card's top reaches this part of the viewport
 		hold: 0.05, // extra dead zone, as a fraction of the range
 		curve: 2, // >1 = slow start, soft landing
 		minRange: 0.08 // never divide by less than this (very short pages)
@@ -70,7 +70,7 @@
 			anchor = items.length ? items[ 0 ].shot : null;
 		}
 
-		return { card: card, anchor: anchor, items: items, range: 1 };
+		return { card: card, anchor: anchor, items: items };
 	}
 
 	function measureTravel( item ) {
@@ -96,22 +96,24 @@
 				return;
 			}
 
-			var rect = group.anchor.getBoundingClientRect();
-			var lead = ( 1 - CFG.startVisible ) * rect.height;
-			var span = vh + lead;
-			if ( span <= 0 ) {
-				return;
+			var anchorRect = group.anchor.getBoundingClientRect();
+			var cardRect = group.card.getBoundingClientRect();
+
+			// Held at the top of the site until the card's top edge reaches
+			// CFG.startAt of the viewport.
+			var start = Math.max( 0, cardRect.top + scrollY - CFG.startAt * vh );
+
+			// Runs until the frame's bottom reaches the top of the viewport, capped
+			// by how far the document can scroll — the last row can never get there,
+			// so its range is compressed and it still lands at the end.
+			var end = Math.min( anchorRect.bottom + scrollY, maxScroll );
+
+			var span = end - start;
+			if ( span < CFG.minRange ) {
+				span = CFG.minRange;
 			}
 
-			var raw = ( vh + lead - rect.bottom ) / span;
-
-			// How far this card can actually progress before the document runs out
-			// of scroll. Cards in the last row otherwise never reach the end.
-			var docBottom = rect.bottom + scrollY;
-			var rawAtMax = ( vh + lead - ( docBottom - maxScroll ) ) / span;
-			group.range = Math.min( 1, Math.max( rawAtMax, CFG.minRange ) );
-
-			var p = raw / group.range;
+			var p = ( scrollY - start ) / span;
 			p = p < 0 ? 0 : ( p > 1 ? 1 : p );
 
 			var offset = -ease( p );

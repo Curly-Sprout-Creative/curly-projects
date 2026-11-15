@@ -36,8 +36,7 @@
 	bottom: 4%;
 	width: 21%;
 	aspect-ratio: 390 / 844;
-	border-radius: 19px;
-	clip-path: inset(0 round 19px);
+	/* Same radius as the desktop frame; the phone used to be rounder. */
 }
 
 .csc-preview__pan {
